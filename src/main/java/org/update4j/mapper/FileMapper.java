@@ -250,11 +250,7 @@ public class FileMapper extends XmlMapper {
         return builder.toString();
     }
 
-    public static long getChecksum(Path path) throws IOException {
-        return FileUtils.getChecksum(path);
-    }
-
-    public static String getChecksumHex(Path path) throws IOException {
+    public static String getChecksum(Path path) throws IOException {
         return FileUtils.getChecksumString(path);
     }
 

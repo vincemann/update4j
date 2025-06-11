@@ -456,6 +456,7 @@ class ConfigImpl {
     private static void validateFile(FileMetadata file, Path output, Signature sig)
                     throws IOException, SignatureException {
 
+
         long actualSize = Files.size(output);
         if (actualSize != file.getSize()) {
             throw new IllegalStateException("Size of file '" + file.getPath().getFileName()
@@ -463,11 +464,11 @@ class ConfigImpl {
                             + actualSize);
         }
 
-        long actualChecksum = FileUtils.getChecksum(output);
-        if (actualChecksum != file.getChecksum()) {
+        String actualChecksum = FileUtils.getChecksumString(output);
+        if (!actualChecksum.equals(file.getChecksum())) {
             throw new IllegalStateException("Checksum of file '" + file.getPath().getFileName()
                             + "' does not match checksum in configuration. Expected: "
-                            + Long.toHexString(file.getChecksum()) + ", found: " + Long.toHexString(actualChecksum));
+                            + file.getChecksum() + ", found: " + actualChecksum);
         }
 
         if (sig != null) {

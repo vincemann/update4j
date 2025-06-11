@@ -54,7 +54,7 @@ public class FileUtils {
     private FileUtils() {
     }
 
-    public static long getChecksum(Path path) throws IOException {
+    private static long getChecksum(Path path) throws IOException {
         try (InputStream input = Files.newInputStream(path)) {
             Adler32 checksum = new Adler32();
             byte[] buf = new byte[1024 * 8];
@@ -67,7 +67,28 @@ public class FileUtils {
         }
     }
 
+    private static String getAppImageChecksum(Path path) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(path.toAbsolutePath().toString(), "--appimage-updateinfo");
+        try {
+            Process process = processBuilder.start();
+            int retCode = process.waitFor();
+            if (retCode != 0 ){
+                throw new RuntimeException("Failed to eval appImage update info. Ret code: " + retCode);
+            }
+            String stdout = new String(process.getInputStream().readAllBytes());
+            String hash = stdout.split("=")[1];
+            if (hash.endsWith("\n"))
+                hash = hash.substring(0, hash.length()-1);
+            return hash;
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Failed to eval appImage update info", e);
+        }
+    }
+
     public static String getChecksumString(Path path) throws IOException {
+        if (path.getFileName().toString().endsWith(".AppImage")){
+            return getAppImageChecksum(path);
+        }
         return Long.toHexString(getChecksum(path));
     }
 
