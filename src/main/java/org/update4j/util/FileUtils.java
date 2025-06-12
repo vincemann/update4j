@@ -76,6 +76,9 @@ public class FileUtils {
                 throw new RuntimeException("Failed to eval appImage update info. Ret code: " + retCode);
             }
             String stdout = new String(process.getInputStream().readAllBytes());
+            if (!stdout.contains("=")){
+                throw new IllegalArgumentException("Invalid update info: " + stdout);
+            }
             String hash = stdout.split("=")[1];
             if (hash.endsWith("\n"))
                 hash = hash.substring(0, hash.length()-1);
